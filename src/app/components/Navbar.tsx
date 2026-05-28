@@ -5,14 +5,32 @@ import { Button } from './ui/button';
 import { useUser } from '../context/UserContext';
 
 function SignInModal({ onClose }: { onClose: () => void }) {
-  const { login } = useUser();
-  const navigate = useNavigate();
+  // const { login } = useUser();
+  // const navigate = useNavigate();
+
+  // const handleSignIn = (provider: 'google' | 'github' | 'email') => {
+  //   login(provider);
+  //   onClose();
+  //   navigate('/');
+  // };
+
 
   const handleSignIn = (provider: 'google' | 'github' | 'email') => {
-    login(provider);
-    onClose();
-    navigate('/');
+    if (provider === 'email') {
+      // Keep this placeholder or point it to your standard /login form route
+      
+      console.log('Traditional login active');
+      return;
+    }
+
+    // 2. Point directly to your Spring Boot port and context path setup
+    const BACKEND_URL = 'http://localhost:8081/api/v1';
+    
+    // 3. Force browser redirection to initiate the Spring Security handshake
+    window.location.href = `${BACKEND_URL}/oauth2/authorization/${provider}`;
   };
+
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">

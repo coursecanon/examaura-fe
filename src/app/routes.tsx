@@ -9,6 +9,7 @@ import { QuizCreator } from './pages/QuizCreator';
 import { Profile } from './pages/Profile';
 import { Navbar } from './components/Navbar';
 import { Toaster } from './components/ui/sonner';
+import { OAuth2RedirectHandler } from './auth/OAuth2RedirectHandler';
 
 function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -78,6 +79,14 @@ export const router = createBrowserRouter([
     element: (
       <RootLayout>
         <Profile />
+      </RootLayout>
+    ),
+  },
+  {
+    path: '/oauth2/redirect',
+    element: (
+      <RootLayout>
+        <OAuth2RedirectHandler />
       </RootLayout>
     ),
   },

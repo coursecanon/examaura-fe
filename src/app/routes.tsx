@@ -10,6 +10,7 @@ import { Profile } from './pages/Profile';
 import { Navbar } from './components/Navbar';
 import { Toaster } from './components/ui/sonner';
 import { OAuth2RedirectHandler } from './auth/OAuth2RedirectHandler';
+import LoginPage from "./pages/LoginPage";
 
 function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -87,6 +88,14 @@ export const router = createBrowserRouter([
     element: (
       <RootLayout>
         <OAuth2RedirectHandler />
+      </RootLayout>
+    ),
+  },
+  {
+    path: '/login',
+    element: (
+      <RootLayout>
+        <LoginPage />
       </RootLayout>
     ),
   },

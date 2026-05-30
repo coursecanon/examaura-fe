@@ -6,7 +6,7 @@ import { useUser } from '../context/UserContext';
 
 function SignInModal({ onClose }: { onClose: () => void }) {
   // const { login } = useUser();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   // const handleSignIn = (provider: 'google' | 'github' | 'email') => {
   //   login(provider);
@@ -20,6 +20,8 @@ function SignInModal({ onClose }: { onClose: () => void }) {
       // Keep this placeholder or point it to your standard /login form route
       
       console.log('Traditional login active');
+      onClose();
+      navigate('/login');
       return;
     }
 

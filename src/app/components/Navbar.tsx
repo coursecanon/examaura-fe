@@ -5,15 +5,7 @@ import { Button } from './ui/button';
 import { useUser } from '../context/UserContext';
 
 function SignInModal({ onClose }: { onClose: () => void }) {
-  // const { login } = useUser();
   const navigate = useNavigate();
-
-  // const handleSignIn = (provider: 'google' | 'github' | 'email') => {
-  //   login(provider);
-  //   onClose();
-  //   navigate('/');
-  // };
-
 
   const handleSignIn = (provider: 'google' | 'github' | 'email') => {
     if (provider === 'email') {

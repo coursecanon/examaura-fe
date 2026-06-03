@@ -60,17 +60,58 @@ export function QuizInstructions() {
           </div>
         </div>
         
-        {/* Instructions & Mode Selection (unchanged visually) */}
+        {/* Instructions */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Instructions</h2>
-          {/* ... Keep your existing instruction UI here ... */}
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <CheckCircle className="w-5 h-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+              <p className="text-slate-700">
+                This quiz contains {quiz.questionCount} questions of various types
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <CheckCircle className="w-5 h-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+              <p className="text-slate-700">
+                You have {quiz.duration} minutes to complete the quiz
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <CheckCircle className="w-5 h-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+              <p className="text-slate-700">
+                You need to score at least {quiz.passingScore || 70}% to pass
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <AlertCircle className="w-5 h-5 text-[#dc2626] flex-shrink-0 mt-0.5" />
+              <p className="text-slate-700">
+                Once you start, the timer will begin and cannot be paused
+              </p>
+            </div>
+          </div>
+          
+          {/* Mode Descriptions */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 border-2 border-[#1e40af] rounded-lg bg-blue-50">
+              <h3 className="font-semibold mb-2 text-[#1e40af]">Exam Mode (Real)</h3>
+              <p className="text-sm text-slate-700">
+                Experience the actual exam conditions with no instant feedback. Results shown only after submission.
+              </p>
+            </div>
+            <div className="p-4 border-2 border-[#10b981] rounded-lg bg-green-50">
+              <h3 className="font-semibold mb-2 text-[#10b981]">Practice Mode</h3>
+              <p className="text-sm text-slate-700">
+                Learn as you go with immediate color-coded feedback on each answer for better learning.
+              </p>
+            </div>
+          </div>
         </div>
         
         {/* Action Buttons */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
-              onClick={() => navigate(`/quiz/${quizId}/attempt?mode=exam`)}
+              onClick={() => navigate(`/quiz/${quizId}/attempt?mode=real`)}
               className="flex-1 bg-[#1e40af] hover:bg-[#1e3a8a] text-white text-lg py-6 font-semibold"
             >
               Start As Real

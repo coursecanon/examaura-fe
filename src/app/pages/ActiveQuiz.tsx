@@ -47,7 +47,7 @@ export function ActiveQuiz() {
   useEffect(() => {
     const initializeQuiz = async () => {
       try {
-        const userId = user?.id || 'dceb2a0a-0918-4c0e-93a5-b9c70875f34f'; 
+        const userId = user?.id; 
 
         const attemptRes = await api.post(`/attempts/start?userId=${userId}`, {
           quizId: quizId,
@@ -204,7 +204,6 @@ const syncAnswerToBackend = async (indexToSync: number) => {
     setCurrentQuestionIndex(index);
   };
 
-  // 👈 FIX 3: Brought back checkAnswer logic
   const checkAnswer = (questionIndex: number) => {
     const question = questions[questionIndex];
     const userAnswer = answers[questionIndex];

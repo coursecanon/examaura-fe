@@ -13,14 +13,6 @@ interface QuestionDisplayProps {
   hasAnswered: boolean;
 }
 
-// export function QuestionDisplay(props: QuestionDisplayProps) {
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <QuestionDisplayInner {...props} />
-//     </DndProvider>
-//   );
-// }
-
 // Change this wrapper to simply forward props to the internal content switcher
 export function QuestionDisplay(props: QuestionDisplayProps) {
   return <QuestionDisplayInner {...props} />;
@@ -165,6 +157,8 @@ function YesNoGridDisplay({ question, userAnswer, onAnswer, isPracticeMode, hasA
     return 'w-12 h-12 rounded-full border-2 border-border bg-slate-50 opacity-50 cursor-pointer flex items-center justify-center';
   };
 
+  
+
   return (
     <div className="overflow-x-auto">
       <div className="min-w-[600px]">
@@ -175,7 +169,7 @@ function YesNoGridDisplay({ question, userAnswer, onAnswer, isPracticeMode, hasA
         </div>
         {question.statements?.map((statement) => (
           <div key={statement.id} className="grid grid-cols-[1fr_100px_100px] gap-4 items-center py-3 border-b border-border">
-            <div className="text-sm">{statement.term}</div>
+            <div className="text-sm">{statement.text}</div>
             <div className="flex justify-center">
               <button onClick={() => handleAnswer(statement.id, 'yes')} className={getButtonClassName(statement.id, 'yes')}>
                 {answers[statement.id] === 'yes' && <div className="w-3 h-3 rounded-full bg-current" />}

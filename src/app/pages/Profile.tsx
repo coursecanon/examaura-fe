@@ -8,19 +8,9 @@ import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import {
-  User,
-  Bell,
-  BookOpen,
-  Edit3,
-  Plus,
-  Clock,
-  Trophy,
-  Lock,
-  LogOut,
-  CheckCircle
-} from 'lucide-react';
+import { User, Bell, BookOpen, Edit3, Plus, Clock, Trophy, Lock, LogOut, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import api from '../api/axiosConfig'; // Ensure you import your api instance
 
 interface Notification {
   id: string;
@@ -29,39 +19,53 @@ interface Notification {
   read: boolean;
 }
 
-const mockNotifications: Notification[] = [
-  { id: '1', message: 'Your new quiz has 10 attempts!', date: '2026-05-10', read: false },
-  { id: '2', message: 'You achieved 90% on AWS Cloud Practitioner Essentials', date: '2026-05-08', read: true },
-  { id: '3', message: 'New quiz available: Azure Security Fundamentals', date: '2026-05-05', read: true },
-];
-
 export function Profile() {
   const { user, isLoggedIn, logout } = useUser();
-  const { quizzes, userHistory } = useQuizzes();
   const navigate = useNavigate();
 
-  const [notifications] = useState<Notification[]>(mockNotifications);
+// Async API State Hooks
+  const [userCreatedQuizzes, setUserCreatedQuizzes] = useState<any[]>([]);
+  const [recentAttempts, setRecentAttempts] = useState<any[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
+  const [notifications] = useState<Notification[]>([]); // Connect to a notification endpoint if needed later
+
+  // Password state
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Dual Endpoint Dispatch
+  useEffect(() => {
+    const fetchDashboardMetrics = async () => {
+      if (!user?.id) return;
+      
+      try {
+        setIsLoadingData(true);
+        const [quizzesResponse, attemptsResponse] = await Promise.all([
+          api.get(`/quizzes/${user.id}/latest`),
+          api.get(`/attempts/${user.id}/recent`)
+        ]);
+
+        console.log("Quizzes Response:", quizzesResponse);
+        console.log("Attempts Response:", attemptsResponse);
+
+        setUserCreatedQuizzes(quizzesResponse.data);
+        setRecentAttempts(attemptsResponse.data);
+      } catch (err) {
+        console.error("Failed to load dashboard metrics:", err);
+        toast.error("Error updating metrics scorecard profile layout.");
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchDashboardMetrics();
+    }
+  }, [user?.id, isLoggedIn]);
+
   // Redirect if not logged in
-  if (!isLoggedIn) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Filter quizzes created by current user (mock: quizzes that start with custom ID pattern)
-  // In a real app, Quiz interface would have a createdBy field
-  const userCreatedQuizzes = quizzes.filter(q => q.id.startsWith('quiz-'));
-
-  // Get last 5 attempts
-  const recentAttempts = userHistory.slice(0, 5);
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-[#10b981]';
-    if (score >= 60) return 'text-amber-500';
-    return 'text-[#dc2626]';
-  };
+  if (!isLoggedIn) return <Navigate to="/" replace />;
 
   const getScoreBadgeVariant = (score: number): 'default' | 'secondary' | 'destructive' | 'outline' => {
     if (score >= 80) return 'default';
@@ -69,40 +73,47 @@ export function Profile() {
     return 'destructive';
   };
 
-  const handlePasswordUpdate = (e: React.FormEvent) => {
+console.log("User Created Quizzes:", userCreatedQuizzes);
+console.log("Recent Attempts:", recentAttempts);
+console.log("Notifications:", notifications);
+console.log("User Info:", user);
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!currentPassword || !newPassword || !confirmPassword) {
       toast.error('Please fill in all password fields');
       return;
     }
-
-    if (newPassword !== confirmPassword) {
-      toast.error('New passwords do not match');
-      return;
-    }
-
     if (newPassword.length < 8) {
       toast.error('Password must be at least 8 characters');
       return;
     }
-
-    // Mock success
-    toast.success('Password updated successfully');
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+    if (newPassword !== confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    
+    try {
+      await api.post('/auth/update-password', { currentPassword, newPassword });
+      toast.success('Password updated successfully');
+      setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+    } catch {
+      toast.error('Failed to update password');
+    }
   };
 
-  const handleLogout = () => {
-    logout();
-    toast.success('Logged out successfully');
-    navigate('/');
-  };
+  const handleLogout = () => { logout(); navigate('/'); };
 
   const handleEditQuiz = (quizId: string) => {
     // Navigate to create quiz page with quiz ID as state for editing
     navigate('/create-quiz', { state: { editQuizId: quizId } });
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   return (
@@ -114,14 +125,19 @@ export function Profile() {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
-                  <User className="w-10 h-10 text-white" />
+                  {/* <User className="w-10 h-10 text-white" /> */}
+                  <img
+                      src={user?.avatar}
+                      alt={user?.name}
+                      className="rounded-full object-cover border-2 border-[#1e40af]/20"
+                    />
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold">{user?.name}</h1>
                   <p className="text-blue-100 mt-1">{user?.email}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <Badge className="bg-white/20 text-white border-white/30">
-                      {userHistory.length} Total Attempts
+                      {/* {userHistory.length} */}Total Attempts
                     </Badge>
                     <Badge className="bg-white/20 text-white border-white/30">
                       {userCreatedQuizzes.length} Quizzes Created
@@ -156,81 +172,50 @@ export function Profile() {
           </TabsList>
 
           {/* Dashboard Tab */}
+          {/* Notifications Tab Content */}
           <TabsContent value="dashboard" className="space-y-6">
-            {/* Notifications Section */}
             <section>
               <div className="flex items-center gap-3 mb-4">
                 <Bell className="w-6 h-6 text-[#1e40af]" />
                 <h2 className="text-2xl font-semibold">Notifications</h2>
               </div>
               <Card className="divide-y divide-border">
-                {notifications.map((notif) => (
-                  <div
-                    key={notif.id}
-                    className={`px-6 py-4 flex items-start gap-3 ${
-                      !notif.read ? 'bg-blue-50' : 'bg-white'
-                    }`}
-                  >
-                    <div className={`mt-1 ${!notif.read ? 'text-[#1e40af]' : 'text-slate-400'}`}>
-                      {!notif.read ? <Bell className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
-                    </div>
-                    <div className="flex-1">
-                      <p className={`${!notif.read ? 'font-semibold text-slate-900' : 'text-slate-600'}`}>
-                        {notif.message}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">{notif.date}</p>
-                    </div>
+                {notifications.length > 0 ? notifications.map((notif) => (
+                  <div key={notif.id} className={`px-6 py-4 flex items-start gap-3 ${!notif.read ? 'bg-blue-50' : 'bg-white'}`}>
+                    {/* ... (Render Notification Item) ... */}
                   </div>
-                ))}
+                )) : <p className="p-6 text-slate-500">No new notifications.</p>}
               </Card>
             </section>
 
-            {/* Recent Activity */}
+            {/* Recent Activity Section */}
             <section>
               <div className="flex items-center gap-3 mb-4">
                 <Trophy className="w-6 h-6 text-[#1e40af]" />
-                <h2 className="text-2xl font-semibold">Recent Activity (Last 5 Attempts)</h2>
+                <h2 className="text-2xl font-semibold">Recent Activity</h2>
               </div>
               {recentAttempts.length > 0 ? (
-                <Card className="overflow-hidden border border-border">
-                  <div className="divide-y divide-border">
+                <Card className="divide-y divide-border">
                     {recentAttempts.map((entry, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-900 truncate">{entry.quizName}</p>
-                          <div className="flex items-center gap-3 mt-1">
-                            <span className="text-xs text-slate-500 capitalize">{entry.category}</span>
-                            <span className="text-slate-300">•</span>
-                            <span className="text-xs text-slate-500 flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {entry.date}
-                            </span>
+                      <div key={entry.attemptId} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-slate-900 truncate">{entry.quizName}</p>
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="text-xs text-slate-500 font-medium capitalize bg-slate-100 px-2 py-0.5 rounded-md">{entry.category}</span>
+                              <span className="text-slate-300">•</span>
+                              <span className="text-xs text-slate-500 flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {formatDate(entry.completedAt)}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        <Badge
-                          variant={getScoreBadgeVariant(entry.score)}
-                          className={`text-sm font-bold px-3 py-1 ${
-                            entry.score >= 80 ? 'bg-[#10b981] text-white' : ''
-                          }`}
-                        >
-                          {entry.score}%
-                        </Badge>
+                        <Badge variant={getScoreBadgeVariant(entry.passedScore)}>{entry.passedScore}%</Badge>
                       </div>
                     ))}
-                  </div>
                 </Card>
               ) : (
                 <Card className="p-8 text-center">
-                  <Trophy className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <p className="text-slate-500">No quiz attempts yet</p>
-                  <Link to="/quizzes">
-                    <Button className="mt-4 bg-[#1e40af] hover:bg-[#1e3a8a]">
-                      Start Your First Quiz
-                    </Button>
-                  </Link>
+                  <p>No quiz attempts yet.</p>
                 </Card>
               )}
             </section>
@@ -272,11 +257,11 @@ export function Profile() {
                     <div className="space-y-2 mb-4 text-sm text-slate-600">
                       <div className="flex items-center gap-2">
                         <BookOpen className="w-4 h-4" />
-                        <span>{quiz.questionCount} Questions</span>
+                        <span>{quiz.totalQuestions} Questions</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
-                        <span>{quiz.duration} Minutes</span>
+                        <span>{quiz.durationMinutes} Minutes</span>
                       </div>
                     </div>
 

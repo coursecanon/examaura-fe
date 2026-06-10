@@ -27,7 +27,7 @@ interface LoginResponse {
   email: string;
   fullName: string;
   role: string;
-  avatar_url?: string | null;
+  avatarUrl?: string | null;
 }
 
 interface UserContextType {
@@ -109,13 +109,14 @@ export function UserProvider({
         );
 
         const userData = response.data;
+        console.log('Restored user session:', userData);
 
         setUser({
           id: userData.id,
           name: userData.fullName,
           email: userData.email,
           role: userData.userRole,
-          avatar: DEFAULT_AVATAR,
+          avatar: userData.avatarUrl || DEFAULT_AVATAR,
         });
       } catch (error) {
         console.error(
@@ -143,7 +144,7 @@ export function UserProvider({
           email: userData.email,
           role: userData.role,
           avatar:
-            userData.avatar_url || DEFAULT_AVATAR,
+            userData.avatarUrl || DEFAULT_AVATAR,
         });
       }
     },

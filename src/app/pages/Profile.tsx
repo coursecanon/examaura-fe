@@ -46,9 +46,6 @@ export function Profile() {
           api.get(`/attempts/${user.id}/recent`)
         ]);
 
-        console.log("Quizzes Response:", quizzesResponse);
-        console.log("Attempts Response:", attemptsResponse);
-
         setUserCreatedQuizzes(quizzesResponse.data);
         setRecentAttempts(attemptsResponse.data);
       } catch (err) {
@@ -73,10 +70,6 @@ export function Profile() {
     return 'destructive';
   };
 
-console.log("User Created Quizzes:", userCreatedQuizzes);
-console.log("Recent Attempts:", recentAttempts);
-console.log("Notifications:", notifications);
-console.log("User Info:", user);
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -137,7 +130,7 @@ console.log("User Info:", user);
                   <p className="text-blue-100 mt-1">{user?.email}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <Badge className="bg-white/20 text-white border-white/30">
-                      {/* {userHistory.length} */}Total Attempts
+                      {recentAttempts.length} Total Attempts
                     </Badge>
                     <Badge className="bg-white/20 text-white border-white/30">
                       {userCreatedQuizzes.length} Quizzes Created

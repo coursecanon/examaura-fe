@@ -40,7 +40,7 @@ function SignInModal({ onClose }: { onClose: () => void }) {
           <div className="bg-[#1e40af] text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900">Sign in to QuizMaster</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Sign in to Examaura</h2>
           <p className="text-slate-500 mt-1 text-sm">Track your progress and quiz history</p>
         </div>
 

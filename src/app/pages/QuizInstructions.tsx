@@ -32,6 +32,7 @@ export function QuizInstructions() {
 
   if (loading) return <div className="p-8 text-center">Loading quiz instructions...</div>;
   if (error || !quiz) return <div className="p-8 text-center text-red-500">{error || 'Quiz not found'}</div>;
+  console.log('Quiz details fetched:', quiz); // Debug log to verify quiz data
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">

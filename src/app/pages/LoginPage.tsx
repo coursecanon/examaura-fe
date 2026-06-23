@@ -18,7 +18,7 @@ import {
   Badge,
   Lock,
 } from "@mui/icons-material";
-import api from "../auth/axios";
+import api from "../api/axiosConfig";
 
 type AuthMode = "login" | "register";
 

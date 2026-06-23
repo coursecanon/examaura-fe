@@ -86,7 +86,7 @@ export function Profile() {
     }
     
     try {
-      await api.post('/auth/update-password', { currentPassword, newPassword });
+      await api.put('/users/profile/password', { currentPassword, newPassword });
       toast.success('Password updated successfully');
       setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
     } catch {
